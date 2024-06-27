@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql:lts
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DATA_API_DB_PASSWORD
+      - MYSQL_DATABASE=$DATA_API_DB_NAME
+    ports:
+      - 3307:$DATA_API_DB_PORT
+    volumes:
+      - mysql_data:/var/lib/mysql
+  app:
+    depends_on:
+      - mysqldb
+    build: .
+    restart: always
+    ports:
+      - 3000:$PORT
+    environment:
+      - PORT=$PORT
+      - DATA_API_DB_SERVICE_HOST=mysqldb
+      - DATA_API_DB_NAME=$DATA_API_DB_NAME
+      - DATA_API_DB_USER=$DATA_API_DB_USER
+      - DATA_API_DB_PORT=$DATA_API_DB_PORT
+      - DATA_API_DB_PASSWORD=$DATA_API_DB_PASSWORD
+      - NODE_ENV=$NODE_ENV
+      - JWT_ACCESS_TOKEN_SECRET=$JWT_ACCESS_TOKEN_SECRET
+      - JWT_EXPIRES_AFTER=$JWT_EXPIRES_AFTER
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:
